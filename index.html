@@ -1,4 +1,5 @@
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>WeatherStar 4000+</title>
@@ -22,7 +23,6 @@ html, body {
   font-family: Star4000, monospace;
 }
 
-/* ===== WS TEXT ===== */
 .ws-text {
   line-height: 1.05;
   letter-spacing: 1px;
@@ -35,9 +35,12 @@ html, body {
 }
 
 .ws-yellow { color: #FFE866; }
-.ws-white  { color: #FFFFFF; }
+.ws-white { color: #FFFFFF; }
 
-/* ===== BACKGROUND ===== */
+.hidden { opacity: 0; }
+.visible { opacity: 1; }
+
+/* background */
 #bg {
   position: absolute;
   inset: 0;
@@ -45,7 +48,7 @@ html, body {
   height: 100%;
 }
 
-/* ===== HEADER ===== */
+/* header */
 #header {
   position: absolute;
   top: 110px;
@@ -61,15 +64,13 @@ html, body {
   font-size: 64px;
 }
 
-/* ===== TIME ===== */
 #time {
   margin-left: auto;
   font-size: 44px;
   text-align: right;
-  transform: translateX(-50px);
 }
 
-/* ===== CURRENT CONDITIONS ===== */
+/* CURRENT CONDITIONS */
 #cc {
   position: absolute;
   top: 300px;
@@ -79,26 +80,17 @@ html, body {
 }
 
 #temp {
-  position: absolute;
-  left: 130px;          /* same X as icon */
   font-size: 140px;
-  transform: translateY(-15px);
 }
 
 #cond {
-  position: absolute;
-  left: 120px;          /* same X as icon */
-  top: 160px;           /* spacing under temp */
   font-size: 56px;
-  transform: translateY(-15px);
+  margin-top: 10px;
 }
 
 #icon {
-  position: absolute;
-  left: 120px;
-  top: 260px;
+  margin-top: 30px;
   width: 220px;
-  height: auto;
 }
 
 #city {
@@ -116,7 +108,22 @@ html, body {
   line-height: 1.25;
 }
 
-/* ===== FOOTER ===== */
+/* TRAVEL FORECAST */
+#travel {
+  position: absolute;
+  top: 300px;
+  left: 240px;
+  width: 1300px;
+  height: 700px;
+  display: none;
+}
+
+.travel-list {
+  font-size: 52px;
+  line-height: 1.3;
+}
+
+/* footer */
 #footer {
   position: absolute;
   bottom: 110px;
@@ -133,21 +140,39 @@ html, body {
   <img id="bg" src="https://wsbylunv.neocities.org/ws4000_bg.png">
 
   <div id="header">
-    <div id="title" class="ws-text ws-yellow">
+    <div id="title" class="ws-text ws-yellow" id="pageTitle">
       <div>Current</div>
       <div>Conditions</div>
     </div>
     <div id="time" class="ws-text ws-white"></div>
   </div>
 
-  <div id="cc">
+  <!-- CURRENT CONDITIONS -->
+  <div id="cc" class="visible">
     <div id="temp" class="ws-text ws-white">--°</div>
     <div id="cond" class="ws-text ws-white">Loading…</div>
-
     <img id="icon" src="">
-
     <div id="city" class="ws-text ws-white">Tampa, FL</div>
     <div id="stats" class="ws-text ws-white"></div>
+  </div>
+
+  <!-- TRAVEL FORECAST -->
+  <div id="travel">
+    <div class="ws-text ws-yellow" style="font-size:64px;margin-bottom:20px;">
+      Travel Forecast for Tomorrow
+    </div>
+    <div class="travel-list ws-text ws-white">
+      Atlanta<br>
+      Boston<br>
+      Chicago<br>
+      Dallas<br>
+      Denver<br>
+      Los Angeles<br>
+      New York<br>
+      San Francisco<br>
+      Seattle<br>
+      Washington, DC
+    </div>
   </div>
 
   <div id="footer" class="ws-text ws-white">
@@ -156,6 +181,7 @@ html, body {
 </div>
 
 <script>
+/* CLOCK */
 function updateTime() {
   const now = new Date();
   document.getElementById("time").innerHTML =
@@ -165,71 +191,58 @@ function updateTime() {
 setInterval(updateTime, 1000);
 updateTime();
 
-function getWs4000Icon(condition) {
-  const c = condition.toLowerCase();
-
-  if (c.includes('thunder') && c.includes('snow')) return 'ThunderSnow.gif';
-  if (c.includes('thunder')) return 'Thunderstorm.gif';
-
-  if (c.includes('freezing rain') && c.includes('sleet')) return 'Freezing-Rain-Sleet.gif';
-  if (c.includes('freezing rain') && c.includes('snow')) return 'Freezing-Rain-Snow.gif';
-  if (c.includes('freezing rain')) return 'Freezing-Rain.gif';
-
-  if (c.includes('sleet') || c.includes('hail')) return 'Sleet.gif';
-  if (c.includes('wintry mix')) return 'Wintry-Mix.gif';
-
-  if (c.includes('heavy snow')) return 'Heavy-Snow.gif';
-  if (c.includes('light snow')) return 'Light-Snow.gif';
-  if (c.includes('snow')) return 'Snow.gif';
-
-  if (c.includes('fog')) return 'Fog.gif';
-  if (c.includes('haze')) return 'Fog.gif';
-
-  if (c.includes('mostly cloudy')) return 'Cloudy.gif';
-  if (c.includes('partly cloudy')) return 'Partly-Cloudy.gif';
-  if (c.includes('mostly clear')) return 'Mostly-Clear.gif';
-  if (c.includes('clear')) return 'Clear.gif';
-
-  if (c.includes('rain') && c.includes('snow')) return 'Rain-Snow.gif';
-  if (c.includes('rain')) return 'Rain.gif';
-  if (c.includes('showers')) return 'Shower.gif';
-
-  return 'Cloudy.gif';
+/* ICON MAP */
+function getIcon(desc) {
+  const c = desc.toLowerCase();
+  if (c.includes("thunder")) return "Thunderstorm.gif";
+  if (c.includes("snow")) return "Snow.gif";
+  if (c.includes("rain")) return "Rain.gif";
+  if (c.includes("fog")) return "Fog.gif";
+  if (c.includes("clear")) return "Clear.gif";
+  return "Cloudy.gif";
 }
 
+/* WEATHER LOAD */
 async function loadWeather() {
-  const point = await fetch("https://api.weather.gov/points/27.95,-82.46").then(r => r.json());
-  const stations = await fetch(point.properties.observationStations).then(r => r.json());
-  const obs = await fetch(stations.features[0].id + "/observations/latest").then(r => r.json());
-
+  const point = await fetch("https://api.weather.gov/points/27.95,-82.46").then(r=>r.json());
+  const stations = await fetch(point.properties.observationStations).then(r=>r.json());
+  const obs = await fetch(stations.features[0].id + "/observations/latest").then(r=>r.json());
   const d = obs.properties;
 
   document.getElementById("temp").textContent =
     Math.round(d.temperature.value * 9/5 + 32) + "°";
-
   document.getElementById("cond").textContent = d.textDescription;
-  
-document.getElementById("icon").src =
-  "https://wsbylunv.neocities.org/yea/" + getWs4000Icon(d.textDescription);
-  
-  const visibilityMiles = d.visibility?.value
-    ? Math.round(d.visibility.value / 1609)
-    : "--";
-
-  const ceilingFeet = d.cloudLayers?.length
-    ? Math.round(d.cloudLayers[0].base.value * 3.281)
-    : "Unlimited";
+  document.getElementById("icon").src =
+    "https://wsbylunv.neocities.org/yea/" + getIcon(d.textDescription);
 
   document.getElementById("stats").innerHTML = `
     Humidity: ${Math.round(d.relativeHumidity.value)}%<br>
-    Dewpoint: ${Math.round(d.dewpoint.value * 9/5 + 32)}°<br>
-    Ceiling: ${ceilingFeet} ft<br>
-    Visibility: ${visibilityMiles} mi<br>
+    Wind: ${Math.round(d.windSpeed.value * 2.237)} mph<br>
     Pressure: ${(d.barometricPressure.value / 3386).toFixed(2)}
   `;
 }
-
 loadWeather();
+
+/* PAGE ROTATION */
+let page = 0;
+
+setInterval(() => {
+  const cc = document.getElementById("cc");
+  const tf = document.getElementById("travel");
+  const title = document.getElementById("pageTitle");
+
+  page = (page + 1) % 2;
+
+  if (page === 1) {
+    cc.style.display = "none";
+    tf.style.display = "block";
+    title.innerHTML = "<div>Travel</div><div>Forecast</div>";
+  } else {
+    tf.style.display = "none";
+    cc.style.display = "block";
+    title.innerHTML = "<div>Current</div><div>Conditions</div>";
+  }
+}, 12000);
 </script>
 
 </body>
